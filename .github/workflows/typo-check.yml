@@ -18,6 +18,8 @@ jobs:
     steps:
     - name: Checkout Actions Repository
       uses: actions/checkout@v5
+      with:
+        fetch-depth: 0
     - name: Setup Python
       uses: actions/setup-python@v6.2.0
     - name: Strip notebook outputs
@@ -35,36 +37,41 @@ jobs:
       contents: read
       pull-requests: write
     steps:
-    - name: Checkout Actions Repository
+    - name: Checkout base branch
       uses: actions/checkout@v5
       with:
+        ref: ${{ github.base_ref }}
         fetch-depth: 0
-    - name: Get changed files
-      id: changed
-      run: |
-        FILES=$(git diff --name-only --diff-filter=ACMR origin/${{ github.base_ref }}...HEAD)
-        echo "$FILES" > /tmp/changed_files.txt
     - name: Setup Python
       uses: actions/setup-python@v6.2.0
-    - name: Strip notebook outputs
+    - name: Strip notebook outputs (base)
       run: |
         python .github/scripts/strip_notebook_outputs.py
         git add -A
-    - name: Spell Check PR files
-      id: spell-check
+    - name: Fix typos on base
       continue-on-error: true
       uses: crate-ci/typos@v1.44.0
       with:
         write_changes: true
         config: .github/typos.toml
-    - name: Keep only PR file changes
+    - name: Stage base fixes as baseline
+      run: git add -A
+    - name: Checkout PR branch
+      uses: actions/checkout@v5
+      with:
+        ref: ${{ github.head_ref }}
+        fetch-depth: 0
+        clean: false
+    - name: Strip notebook outputs (PR)
       run: |
-        # Discard typo fixes for files not in the PR
-        git diff --name-only | while read -r file; do
-          if ! grep -qxF "$file" /tmp/changed_files.txt; then
-            git checkout -- "$file"
-          fi
-        done
+        python .github/scripts/strip_notebook_outputs.py
+        git add -A
+    - name: Fix typos on PR
+      continue-on-error: true
+      uses: crate-ci/typos@v1.44.0
+      with:
+        write_changes: true
+        config: .github/typos.toml
     - name: Comment on PR
       uses: getsentry/action-git-diff-suggestions@main
       with:

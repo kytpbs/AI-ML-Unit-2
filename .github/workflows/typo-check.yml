@@ -15,6 +15,9 @@ jobs:
   spelling:
     name: Spell Check with Typos
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
     steps:
     - name: Checkout Actions Repository
       uses: actions/checkout@v5
@@ -23,6 +26,17 @@ jobs:
     - name: Strip notebook outputs
       run: python .github/scripts/strip_notebook_outputs.py
     - name: Spell Check Repo
+      id: spell-check
+      continue-on-error: true
       uses: crate-ci/typos@v1.44.0
       with:
+        write_changes: true
         config: .github/typos.toml
+    - name: Comment on PR
+      if: github.event_name == 'pull_request'
+      uses: getsentry/action-git-diff-suggestions@main
+      with:
+        message: "Typos found in the above files"
+    - name: Fail on typo
+      if: steps.spell-check.outcome == 'failure'
+      run: exit 1

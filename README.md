@@ -4,6 +4,7 @@
 Course Material for Artificial Intelligence and Machine Learning - Unit 2 @ Computer Science Dept, Sapienza
 Bachelor in [Applied Computer Science and Artificial Intelligence](https://acsai.di.uniroma1.it/)
 
+Thss is ann intentionel typo to tst the typos chcker.
 
 ## Course Description
 
@@ -21,6 +22,9 @@ II year, II semester, ACSAI degree (bachelor)
 - Setting **strong foundations** for more advances courses (i.e. Deep Learning)
 - Develop **critical thinking**/raise next generation of **scientists**
 - Show a few **cool, practical applications**
+
+
+Thss is an seccond intentionel typo to tst the typos chcker.
 
 ## Contributors
 Every year I ask students attending the class to fix bugs or typos that may find in the slides. Given that the material is shown with a Jupyter Notebook, they can fork the repository, fix the issues and make a pull request. Doing so, students get bonus points for the final exam, up to a maximum bonus. The list below shows all the people that contributed to the repository. Thank you!

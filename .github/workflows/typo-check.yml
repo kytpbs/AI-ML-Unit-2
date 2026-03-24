@@ -24,7 +24,10 @@ jobs:
     - name: Setup Python
       uses: actions/setup-python@v6.2.0
     - name: Strip notebook outputs
-      run: python .github/scripts/strip_notebook_outputs.py
+      run: |
+        python .github/scripts/strip_notebook_outputs.py
+        git add -A
+        git -c user.name="ci" -c user.email="ci@ci" commit -m "strip outputs" --allow-empty
     - name: Spell Check Repo
       id: spell-check
       continue-on-error: true

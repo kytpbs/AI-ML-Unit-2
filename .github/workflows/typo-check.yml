@@ -15,31 +15,57 @@ jobs:
   spelling:
     name: Spell Check with Typos
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      pull-requests: write
     steps:
     - name: Checkout Actions Repository
       uses: actions/checkout@v5
     - name: Setup Python
       uses: actions/setup-python@v6.2.0
     - name: Strip notebook outputs
+      run: python .github/scripts/strip_notebook_outputs.py
+    - name: Spell Check Repo
+      uses: crate-ci/typos@v1.44.0
+      with:
+        config: .github/typos.toml
+
+  pr-suggestions:
+    name: PR Typo Suggestions
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+    - name: Checkout Actions Repository
+      uses: actions/checkout@v5
+      with:
+        fetch-depth: 0
+    - name: Get changed files
+      id: changed
+      run: |
+        FILES=$(git diff --name-only --diff-filter=ACMR origin/${{ github.base_ref }}...HEAD)
+        echo "$FILES" > /tmp/changed_files.txt
+    - name: Setup Python
+      uses: actions/setup-python@v6.2.0
+    - name: Strip notebook outputs
       run: |
         python .github/scripts/strip_notebook_outputs.py
         git add -A
-        git -c user.name="ci" -c user.email="ci@ci" commit -m "strip outputs" --allow-empty
-    - name: Spell Check Repo
+    - name: Spell Check PR files
       id: spell-check
       continue-on-error: true
       uses: crate-ci/typos@v1.44.0
       with:
         write_changes: true
         config: .github/typos.toml
+    - name: Keep only PR file changes
+      run: |
+        # Discard typo fixes for files not in the PR
+        git diff --name-only | while read -r file; do
+          if ! grep -qxF "$file" /tmp/changed_files.txt; then
+            git checkout -- "$file"
+          fi
+        done
     - name: Comment on PR
-      if: github.event_name == 'pull_request'
       uses: getsentry/action-git-diff-suggestions@main
       with:
         message: "Typos found in the above files"
-    - name: Fail on typo
-      if: steps.spell-check.outcome == 'failure'
-      run: exit 1

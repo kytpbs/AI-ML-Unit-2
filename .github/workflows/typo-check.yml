@@ -55,7 +55,8 @@ jobs:
     - name: Stage base fixes as baseline
       run: git add -A
     - name: Restore PR content
-      run: git checkout ${{ github.event.pull_request.head.sha }} -- .
+      run: git diff --name-only HEAD ${{ github.event.pull_request.head.sha }} \
+       | xargs -r git checkout ${{ github.event.pull_request.head.sha }} --
     - name: Strip notebook outputs (PR)
       run: |
         python .github/scripts/strip_notebook_outputs.py

@@ -53,10 +53,17 @@ jobs:
         write_changes: true
         config: .github/typos.toml
     - name: Stage base fixes as baseline
-      run: git add -A
+      run: |
+        git add -A
     - name: Restore PR content
-      run: git diff --name-only HEAD ${{ github.event.pull_request.head.sha }} \
-       | xargs -r git checkout ${{ github.event.pull_request.head.sha }} --
+      run: |
+        git stash push
+        git switch --detach ${{ github.event.pull_request.head.sha }}
+        if ! git stash pop; then
+          git checkout --ours .
+          git add -A
+        fi
+        git add -A
     - name: Strip notebook outputs (PR)
       run: |
         python .github/scripts/strip_notebook_outputs.py

@@ -54,12 +54,8 @@ jobs:
         config: .github/typos.toml
     - name: Stage base fixes as baseline
       run: git add -A
-    - name: Checkout PR branch
-      uses: actions/checkout@v5
-      with:
-        ref: ${{ github.head_ref }}
-        fetch-depth: 0
-        clean: false
+    - name: Restore PR content
+      run: git checkout ${{ github.event.pull_request.head.sha }} -- .
     - name: Strip notebook outputs (PR)
       run: |
         python .github/scripts/strip_notebook_outputs.py

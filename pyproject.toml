@@ -1,0 +1,27 @@
+[project]
+name = "ai-ml-unit-2"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "basedpyright>=1.38.3",
+    "jupyter==1.0.0",
+    "jupyter-contrib-core==0.3.3",
+    "jupyter-contrib-nbextensions==0.5.1",
+    "jupyterlab>=4.5.6",
+    "jupyterlab-lsp>=5.2.0",
+    "jupyterlab-rise>=0.43.1",
+    "matplotlib>=3.10.8",
+    "matplotlib-inline>=0.2.1",
+    "notebook==6.4.3",
+    "numpy>=2.4.3",
+    "pandas>=3.0.1",
+    "pillow>=12.1.1",
+    "rise==5.7.1",
+    "scikit-learn>=1.8.0",
+    "scipy>=1.17.1",
+    "torch>=2.11.0",
+    "torchvision>=0.26.0",
+    "torchviz>=0.0.3",
+]
